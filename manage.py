@@ -17,7 +17,7 @@ def test():
 @manager.command
 def init_db():
     '''Create the local database for development'''
-    from scraper.models import db
+    from scraper import db
     db.create_all()
 
 
