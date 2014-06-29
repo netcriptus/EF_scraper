@@ -24,7 +24,7 @@ def init_db():
 @manager.command
 def drop_db():
     '''Drop the local database for development'''
-    from scraper.models import db
+    from scraper import db
     db.drop_all()
 
 

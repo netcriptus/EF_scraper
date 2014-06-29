@@ -8,7 +8,7 @@ db = SQLAlchemy()
 
 
 def make_celery(app):
-    celery = Celery(app.import_name, broker=app.config['CELERY_BROKER_URL'])
+    celery = Celery(app.import_name, broker=app.config['BROKER_URL'])
     celery.conf.update(app.config)
     TaskBase = celery.Task
     class ContextTask(TaskBase):
@@ -28,9 +28,12 @@ def create_app():
 
     # Blueprints
     from scraper.twitter import twitter
+    from scraper.facebook import facebook
     from scraper.controllers import controllers
-    #
+
+    # Register blueprints
     app.register_blueprint(twitter)
+    app.register_blueprint(facebook)
     app.register_blueprint(controllers)
 
     app.secret_key = str(uuid4())
