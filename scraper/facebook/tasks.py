@@ -1,35 +1,30 @@
 import requests
-from BeautifulSoup import BeautifulSoup as Soup
+import json
 
 from scraper import make_celery, create_app
-from scraper.models.twitter import Twitter
+from scraper.models.facebook import Facebook
 
 app = create_app()
 celery = make_celery(app)
 
 
 @celery.task()
-def scrape_twitter(username):
-    response = requests.get(app.config["TWITTER_BASE_URL"] + username)
+def scrape_facebook(username):
+    facebook_base_query = "?q=SELECT%20friend_count%20,%20name,%20pic%20%20FROM%20user%20WHERE%20uid='{0}'"
+    response = requests.get(app.config["FACEBOOK_BASE_URL"] + facebook_base_query.format(username))
+
     if response.status_code != 200:
         return None
 
-    profile = Twitter.query.filter_by(username=username).first()
+    profile = Facebook.query.filter_by(username=username).first()
     if not profile:
-        profile = Twitter(username=username)
+        profile = Facebook(username=username)
 
-    html = Soup(response.content)
+    data = json.loads(response.content)["data"][0]
 
-    obj = html.find("li", {"class": "ProfileNav-item ProfileNav-item--followers"})
-    profile.popularity_index = int(obj.findAll("span")[-1].text)
-
-    obj = html.find("h1", {"class": "ProfileHeaderCard-name"})
-    profile.full_name = obj.text
-
-    obj = html.find("p", {"class": "ProfileHeaderCard-bio u-dir"})
-    profile.description = obj.text
-
-    obj = html.find("img", {"class": "ProfileAvatar-image "})
-    profile.picture_url = obj["src"]
+    profile.popularity_index = data["friend_count"]
+    profile.description = ""
+    profile.full_name = data["name"]
+    profile.picture_url = data["pic"]
 
     profile.save()

@@ -1,20 +1,19 @@
 
-from flask import make_response
+from flask import make_response, jsonify
 
-from . import twitter
-from tasks import scrape_twitter
-from scraper.models.twitter import Twitter
+from . import facebook
+from tasks import scrape_facebook
+from scraper.models.facebook import Facebook
 
 
-@twitter.route("/<username>", methods=["GET"])
+@facebook.route("/<username>", methods=["GET"])
 def get_user_info(username):
-    profile = Twitter.query.filter_by(username=username).first()
-
-    # update our data everytime this profile is requested
-    scrape_twitter.delay(username)
+    profile = Facebook.query.filter_by(username=username).first()
 
     if not profile:
+        scrape_facebook.delay(username)
         resp = make_response("processing request", 202)
     else:
-        resp = make_response(profile, 200)
+        resp = jsonify(name=profile.full_name, picture_url=profile.picture_url,
+                       description=profile.description, popularity_index=profile.popularity_index)
     return resp
