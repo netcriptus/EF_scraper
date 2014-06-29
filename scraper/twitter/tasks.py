@@ -6,11 +6,12 @@ from scraper.models.twitter import Twitter
 
 celery = make_celery()
 
+
 @celery.task
 def scrape_twitter(username):
     response = requests.get('http://twitter.com/' + username)
     if response.status_code != 200:
-        return None
+        return False
 
     profile = Twitter.query.filter_by(username=username).first()
     if not profile:
@@ -30,4 +31,4 @@ def scrape_twitter(username):
     obj = html.find("img", {"class": "ProfileAvatar-image "})
     profile.picture_url = obj["src"] if obj else ""
 
-    profile.save()
+    return profile.save()

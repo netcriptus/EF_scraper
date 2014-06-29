@@ -13,11 +13,11 @@ def scrape_facebook(username):
     response = requests.get('https://graph.facebook.com/fql' + facebook_base_query.format(username))
 
     if response.status_code != 200:
-        return None
+        return False
 
     data = json.loads(response.content)["data"]
     if not len(data):
-        return None
+        return False
     data = data[0]
 
     profile = Facebook.query.filter_by(username=username).first()
@@ -29,4 +29,4 @@ def scrape_facebook(username):
     profile.full_name = data["name"]
     profile.picture_url = data["pic"]
 
-    profile.save()
+    return profile.save()
