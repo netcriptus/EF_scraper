@@ -1,4 +1,3 @@
-
 from uuid import uuid4
 from celery import Celery
 from flask import Flask
@@ -7,12 +6,15 @@ from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-def make_celery(app):
+def make_celery(app=None):
+    app = app or create_app()
     celery = Celery(app.import_name, broker=app.config['BROKER_URL'])
     celery.conf.update(app.config)
     TaskBase = celery.Task
+
     class ContextTask(TaskBase):
         abstract = True
+
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return TaskBase.__call__(self, *args, **kwargs)
