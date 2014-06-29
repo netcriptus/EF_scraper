@@ -15,11 +15,14 @@ def scrape_facebook(username):
     if response.status_code != 200:
         return None
 
+    data = json.loads(response.content)["data"]
+    if not len(data):
+        return None
+    data = data[0]
+
     profile = Facebook.query.filter_by(username=username).first()
     if not profile:
         profile = Facebook(username=username)
-
-    data = json.loads(response.content)["data"][0]
 
     profile.popularity_index = data["friend_count"]
     profile.description = ""
