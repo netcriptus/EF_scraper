@@ -3,6 +3,8 @@ from celery import Celery
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
+__version__ = '0.1.0'
+
 db = SQLAlchemy()
 
 
