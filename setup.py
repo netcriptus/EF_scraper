@@ -23,7 +23,7 @@ long_description = read('readme.md')
 
 setup(name='scraper',
       version=scraper.__version__,
-      url='',
+      url='https://github.com/netcriptus/EF_scraper',
       license='?',
       author='Fernando Cezar',
       cmdclass={'test': nose},
