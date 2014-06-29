@@ -1,21 +1,29 @@
-from scraper import db
-from scraper.tests import BaseTestCase
+from scraper.twitter.tasks import scrape_twitter
+from scraper.models.twitter import Twitter
+from scraper.tests.base import BaseTestCase
 
 
-class AuthorizationTest(BaseTestCase):
+class TwitterTest(BaseTestCase):
 
     def test_asyncronous_response(self):
-        db.create_all()
+        self.setup()
         response = self.client.get("/twitter/fernando_cezar")
         self.assertEqual(response.status_code, 202)
-        db.session.remove()
-        db.drop_all()
+        self.teardown()
 
     def test_parsed_profile_response(self):
-        db.create_all()
-        response = self.client.get("/twitter/fernando_cezar")
-        self.assertEqual(response.status_code, 202)
+        self.setup()
+        profile = Twitter(username="fernando_cezar")
+        profile.save()
         response = self.client.get("/twitter/fernando_cezar")
         self.assertEqual(response.status_code, 200)
-        db.session.remove()
-        db.drop_all()
+        self.teardown()
+
+    def test_scrape_tool(self):
+        self.setup()
+        profile = Twitter.query.filter_by(username="fernando_cezar").first()
+        self.assertEqual(profile, None)
+        scrape_twitter("fernando_cezar")
+        profile = Twitter.query.filter_by(username="fernando_cezar").first()
+        self.assertNotEqual(profile, None)
+        self.teardown()
