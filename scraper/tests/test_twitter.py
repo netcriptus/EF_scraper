@@ -27,3 +27,14 @@ class TwitterTest(BaseTestCase):
         profile = Twitter.query.filter_by(username="fernando_cezar").first()
         self.assertNotEqual(profile, None)
         self.teardown()
+
+    def test_profile_do_not_exist(self):
+        # TODO: this test REALLY should be mocked
+        self.setup()
+        profile = Twitter.query.filter_by(username="fslgkjbfds").first()
+        self.assertEqual(profile, None)
+        return_code = scrape_twitter("fslgkjbfds")
+        self.assertEqual(return_code, False)
+        profile = Twitter.query.filter_by(username="fslgkjbfds").first()
+        self.assertEqual(profile, None)
+        self.teardown()

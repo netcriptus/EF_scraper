@@ -27,3 +27,14 @@ class FacebookTest(BaseTestCase):
         profile = Facebook.query.filter_by(username="fcezar1").first()
         self.assertNotEqual(profile, None)
         self.teardown()
+
+    def test_profile_do_not_exist(self):
+        # TODO: this test REALLY should be mocked
+        self.setup()
+        profile = Facebook.query.filter_by(username="qwerty").first()
+        self.assertEqual(profile, None)
+        return_code = scrape_facebook("qwerty")
+        self.assertEqual(return_code, False)
+        profile = Facebook.query.filter_by(username="qwerty").first()
+        self.assertEqual(profile, None)
+        self.teardown()
