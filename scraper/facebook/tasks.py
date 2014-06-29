@@ -1,17 +1,16 @@
-import requests
 import json
+import requests
 
-from scraper import make_celery, create_app
+from scraper import make_celery
 from scraper.models.facebook import Facebook
 
-app = create_app()
-celery = make_celery(app)
+celery = make_celery()
 
 
-@celery.task()
+@celery.task
 def scrape_facebook(username):
-    facebook_base_query = "?q=SELECT%20friend_count%20,%20name,%20pic%20%20FROM%20user%20WHERE%20uid='{0}'"
-    response = requests.get(app.config["FACEBOOK_BASE_URL"] + facebook_base_query.format(username))
+    facebook_base_query = "?q=SELECT%20friend_count%20,%20name,%20pic%20%20FROM%20user%20WHERE%20username='{0}'"
+    response = requests.get('https://graph.facebook.com/fql' + facebook_base_query.format(username))
 
     if response.status_code != 200:
         return None

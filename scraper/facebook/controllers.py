@@ -2,7 +2,7 @@
 from flask import make_response, jsonify
 
 from . import facebook
-from tasks import scrape_facebook
+from scraper.facebook.tasks import scrape_facebook
 from scraper.models.facebook import Facebook
 
 

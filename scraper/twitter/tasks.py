@@ -1,16 +1,14 @@
 import requests
 from BeautifulSoup import BeautifulSoup as Soup
 
-from scraper import make_celery, create_app
+from scraper import make_celery
 from scraper.models.twitter import Twitter
 
-app = create_app()
-celery = make_celery(app)
+celery = make_celery()
 
-
-@celery.task()
+@celery.task
 def scrape_twitter(username):
-    response = requests.get(app.config["TWITTER_BASE_URL"] + username)
+    response = requests.get('http://twitter.com/' + username)
     if response.status_code != 200:
         return None
 

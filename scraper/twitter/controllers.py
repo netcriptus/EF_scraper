@@ -2,7 +2,7 @@
 from flask import make_response, jsonify
 
 from . import twitter
-from tasks import scrape_twitter
+from scraper.twitter.tasks import scrape_twitter
 from scraper.models.twitter import Twitter
 
 
@@ -11,7 +11,7 @@ def get_user_info(username):
     profile = Twitter.query.filter_by(username=username).first()
 
     if not profile:
-        scrape_twitter(username)
+        scrape_twitter.delay(username)
         resp = make_response("processing request", 202)
     else:
         resp = jsonify(name=profile.full_name, picture_url=profile.picture_url,
